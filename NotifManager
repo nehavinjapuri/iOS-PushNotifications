@@ -1,0 +1,49 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using Unity.Notifications.iOS;
+using TMPro;
+
+
+public class NotificationController : MonoBehaviour
+{
+
+    /// <summary>Authorizes push notification and receives device token.</summary>
+    /// <param name="deviceToken">Stores device's unique identification.</param>
+    /// <param name="deviceTokenText">Text to display device token.</param>
+	public static byte[] deviceToken;
+    public TextMeshProUGUI deviceTokenText;
+    
+    /// <summary>Start is called before the first frame update.</summary>
+    public void Start()
+    {
+        StartCoroutine(RequestAuthorization());
+    }
+    
+
+    /// <summary>Asks device for push notification permissions and displays device token.</summary>
+    /// <returns>While waiting for authorization, returns null.</returns>
+    public IEnumerator RequestAuthorization()
+    {
+        var authorizationOption = AuthorizationOption.Alert | AuthorizationOption.Badge;
+        using (var req = new AuthorizationRequest(authorizationOption, true))
+        {
+            while (!req.IsFinished)
+            {
+                deviceTokenText.text = "Still waiting";
+                yield return null;
+            };
+
+            string res = "\n RequestAuthorization:";
+            res += "\n finished: " + req.IsFinished;
+            res += "\n granted :  " + req.Granted;
+            res += "\n error:  " + req.Error;
+            res += "\n deviceToken:  " + req.DeviceToken;
+            Debug.Log(req.DeviceToken);
+            deviceTokenText.text = req.DeviceToken;
+
+
+        }
+    }
+
+}
